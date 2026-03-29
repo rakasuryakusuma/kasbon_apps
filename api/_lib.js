@@ -66,18 +66,18 @@ async function destroySession(token) {
 }
 
 function setCookie(res, name, value, maxAge) {
-  // Added: Secure (for HTTPS), and a dynamic Max-Age
-  const isProd = process.env.NODE_ENV === 'production';
-  const attributes = [
+  // We force Secure and SameSite=Lax for the best PWA compatibility
+  // Max-Age is in seconds
+  const cookieStr = [
     `${name}=${value}`,
     `Max-Age=${maxAge}`,
     `Path=/`,
     `HttpOnly`,
-    `SameSite=Strict`,
-    isProd ? `Secure` : '' // Only enforce Secure on Vercel/HTTPS
-  ].filter(Boolean).join('; ');
+    `Secure`,
+    `SameSite=Lax`
+  ].join('; ');
 
-  res.setHeader('Set-Cookie', attributes);
+  res.setHeader('Set-Cookie', cookieStr);
 }
 function clearCookie(res, name) {
   res.setHeader('Set-Cookie', `${name}=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0`);
