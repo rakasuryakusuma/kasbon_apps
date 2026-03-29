@@ -481,7 +481,7 @@ function closeAdmin() { document.getElementById('adminPanel').classList.remove('
 async function loadUsers() {
   const list = document.getElementById('userList');
   try {
-    const r = await fetch('/api/admin/users');
+    const r = await fetch('/api/admin');
     const users = await r.json();
     list.innerHTML = users.map(u => `
       <div class="user-row">
@@ -506,7 +506,7 @@ async function addUser() {
   if (password.length<6)    { msg.textContent='Password too short (min 6 chars).'; msg.classList.add('err'); return; }
   btn.disabled=true; btn.textContent='Adding…';
   try {
-    const r = await fetch('/api/admin/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password,role})});
+    const r = await fetch('/api/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password,role})});
     const d = await r.json();
     if (r.ok) {
       msg.textContent=`✓ User "${username}" created!`; msg.classList.add('ok');
@@ -521,7 +521,7 @@ async function addUser() {
 async function deleteUser(id, username) {
   if (!confirm(`Remove user "${username}"? All their transactions will be deleted too.`)) return;
   try {
-    await fetch('/api/admin/users/'+id,{method:'DELETE'});
+    await fetch('/api/admin?id='+id,{method:'DELETE'});
     await loadUsers();
   } catch { alert('Could not remove user.'); }
 }
