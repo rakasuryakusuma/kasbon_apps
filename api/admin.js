@@ -6,11 +6,13 @@ module.exports = async (req, res) => {
   if (session.role !== 'admin') return json(res, 403, { error: 'Forbidden' });
 
   const sb  = getSupabase();
-  const url = req.url.replace(/\?.*$/, '');
-  const idMatch = url.match(/\/admin\/users\/(\d+)$/);
-  const userId  = idMatch ? parseInt(idMatch[1]) : null;
+  
+  // Safely extract the ID directly from the query parameter (?id=123)
+  const urlObj = new URL(req.url, 'http://localhost');
+  const queryId = urlObj.searchParams.get('id');
+  const userId = queryId ? parseInt(queryId) : null;
 
-  // GET /api/admin/users
+  // GET /api/admin
   if (!userId && req.method === 'GET') {
     const { data } = await sb
       .from('users')
@@ -19,7 +21,7 @@ module.exports = async (req, res) => {
     return json(res, 200, data || []);
   }
 
-  // POST /api/admin/users
+  // POST /api/admin
   if (!userId && req.method === 'POST') {
     const { username, password, role } = req.body;
     if (!username || !password) return json(res, 400, { error: 'Missing fields' });
@@ -37,7 +39,7 @@ module.exports = async (req, res) => {
     return json(res, 201, data);
   }
 
-  // DELETE /api/admin/users/:id
+  // DELETE /api/admin?id=:id
   if (userId && req.method === 'DELETE') {
     if (userId === session.user_id) return json(res, 400, { error: 'Cannot delete yourself' });
     await sb.from('users').delete().eq('id', userId);
