@@ -1,0 +1,11 @@
+{
+  "name": "kasbon-budget-tracker",
+  "version": "2.0.0",
+  "description": "Personal budget tracker — Supabase + Vercel",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  }
+}
