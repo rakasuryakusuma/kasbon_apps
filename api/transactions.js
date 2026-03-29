@@ -15,10 +15,13 @@ module.exports = async (req, res) => {
   if (!txId && req.method === 'GET') {
     const { data, error } = await sb
       .from('transactions')
-      .select('id, type, desc, amount, category, date')
+      // Alias the 'description' column to 'desc' so the frontend is happy
+      .select('id, type, desc:description, amount, category, date')
       .eq('user_id', session.user_id)
       .order('created_at', { ascending: false });
-    if (error) return json(res, 500, { error: 'DB error' });
+      
+    // Bonus: Output the actual error message so you can see it in Vercel logs!
+    if (error) return json(res, 500, { error: error.message }); 
     return json(res, 200, data);
   }
 
@@ -30,10 +33,13 @@ module.exports = async (req, res) => {
 
     const { data, error } = await sb
       .from('transactions')
-      .insert({ user_id: session.user_id, type, desc, amount, category, date })
-      .select('id, type, desc, amount, category, date')
+      // Insert 'desc' into the 'description' column
+      .insert({ user_id: session.user_id, type, description: desc, amount, category, date })
+      // Return the newly created row with the alias
+      .select('id, type, desc:description, amount, category, date')
       .single();
-    if (error) return json(res, 500, { error: 'DB error' });
+      
+    if (error) return json(res, 500, { error: error.message });
     return json(res, 201, data);
   }
 
@@ -44,7 +50,8 @@ module.exports = async (req, res) => {
       .delete()
       .eq('id', txId)
       .eq('user_id', session.user_id); // safety: only delete own transactions
-    if (error) return json(res, 500, { error: 'DB error' });
+      
+    if (error) return json(res, 500, { error: error.message });
     return json(res, 200, { success: true });
   }
 
