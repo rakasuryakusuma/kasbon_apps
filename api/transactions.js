@@ -5,11 +5,10 @@ module.exports = async (req, res) => {
   if (!session) return json(res, 401, { error: 'Unauthorized' });
 
   const sb  = getSupabase();
-  const url = req.url.replace(/\?.*$/, '');
 
   // Extract transaction id from URL if present: /api/transactions/123
-  const idMatch = url.match(/\/transactions\/(\d+)$/);
-  const txId    = idMatch ? parseInt(idMatch[1]) : null;
+  // Safely grab the ID directly from the query parameter
+  const txId = req.query?.id || new URL(req.url, `http://localhost`).searchParams.get('id');
 
   // GET /api/transactions
   if (!txId && req.method === 'GET') {
