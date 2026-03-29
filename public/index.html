@@ -355,7 +355,7 @@ document.getElementById('loginUser').addEventListener('keydown',e=>{if(e.key==='
 // ── Boot ──
 async function boot() {
   try {
-    const r = await fetch('/api/setup-status');
+    const r = await fetch('/api/setup');
     const d = await r.json();
     if (d.needsSetup) { showScreen('setup'); return; }
   } catch {}
