@@ -465,8 +465,13 @@ async function addTransaction(fid) {
 
 async function deleteTransaction(id) {
   try {
-    const r = await fetch('/api/transactions/'+id,{method:'DELETE'});
+    // 1. Changed the URL to use ?id=
+    const r = await fetch('/api/transactions?id=' + id, {method: 'DELETE'});
     if (r.status===401){showScreen('login');return;}
+    
+    // 2. Added this safety check so it only hides if the DB actually deleted it!
+    if (!r.ok) throw new Error(); 
+    
     transactions=transactions.filter(t=>t.id!==id); render();
   } catch { alert('Could not delete.'); }
 }
